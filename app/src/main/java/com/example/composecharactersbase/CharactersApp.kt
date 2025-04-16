@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -25,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,30 +49,50 @@ fun CharacterApp() {
 
 @Composable
 fun CharacterListScreen() {
+    val viewModel = remember { CharacterViewModel() }
+    val character = viewModel.character.value
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchCharacter()
+    }
+
+    val scrollState = rememberScrollState()
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize() // Preenche .
+            .padding(16.dp), // Adiciona um espaçamento interno de 16dp.
+        verticalArrangement = Arrangement.spacedBy(12.dp) // Espaçamento entre os itens da lista.
+    ) {
+        // Para cada personagem na lista, cria um item na LazyColumn.
+        items(character) { character ->
+            CharacterCard(character) // Exibe o cartão do personagem.
+        }
+    }
     // Lista de personagens mockados (dados fictícios para teste).
-    val characters = listOf(
-        CharacterMock(
+    /*val characters = listOf(
+        Character(
             name = "Rick Sanchez",
             status = "Alive",
             species = "Human",
             imageUrl = "https://rickandmortyapi.com/api/character/avatar/1.jpeg"
         ),
-        CharacterMock(
+        Character(
             name = "Morty Smith",
             status = "Alive",
             species = "Human",
             imageUrl = "https://rickandmortyapi.com/api/character/avatar/2.jpeg"
         ),
-        CharacterMock(
+        Character(
             name = "Summer Smith",
             status = "Alive",
             species = "Human",
             imageUrl = "https://rickandmortyapi.com/api/character/avatar/3.jpeg"
         )
-    )
+    )*/
 
     // LazyColumn é uma lista otimizada para exibir grandes quantidades de dados.
-    LazyColumn(
+    /*LazyColumn(
         modifier = Modifier
             .fillMaxSize() // Preenche todo o espaço disponível.
             .padding(16.dp), // Adiciona um espaçamento interno de 16dp.
@@ -80,11 +102,11 @@ fun CharacterListScreen() {
         items(characters) { character ->
             CharacterCard(character) // Exibe o cartão do personagem.
         }
-    }
+    }*/
 }
 
 @Composable
-fun CharacterCard(character: CharacterMock) {
+fun CharacterCard(character: Character) {
     // Estado que controla se o personagem é favorito ou não.
     var isFavorite by remember { mutableStateOf(false) }
 
@@ -104,13 +126,13 @@ fun CharacterCard(character: CharacterMock) {
             verticalAlignment = Alignment.CenterVertically // Alinha os elementos verticalmente ao centro.
         ) {
             // Exibe a imagem do personagem.
-            Image(
+            /*Image(
                 painter = rememberAsyncImagePainter(model = character.imageUrl), // Carrega a imagem da URL.
                 contentDescription = "Character image", // Descrição da imagem para acessibilidade.
                 modifier = Modifier
                     .size(100.dp) // Define o tamanho da imagem.
                     .clip(RoundedCornerShape(12.dp)) // Adiciona bordas arredondadas à imagem.
-            )
+            )*/
 
             // Espaçamento horizontal entre a imagem e o texto.
             Spacer(modifier = Modifier.width(16.dp))
@@ -123,11 +145,11 @@ fun CharacterCard(character: CharacterMock) {
                 verticalArrangement = Arrangement.Center // Alinha os textos verticalmente ao centro.
             ) {
                 // Exibe o nome do personagem.
-                Text(text = character.name, style = MaterialTheme.typography.titleMedium)
+                Text(text = character.nome, style = MaterialTheme.typography.titleMedium)
                 // Exibe o status do personagem.
                 Text(text = "Status: ${character.status}")
                 // Exibe a espécie do personagem.
-                Text(text = "Species: ${character.species}")
+                Text(text = "Species: ${character.especie}")
             }
 
             // Botão para marcar/desmarcar o personagem como favorito.
@@ -147,11 +169,3 @@ fun CharacterCard(character: CharacterMock) {
         }
     }
 }
-
-// Classe de dados que representa um personagem.
-data class CharacterMock(
-    val name: String, // Nome do personagem.
-    val status: String, // Status do personagem (ex.: Vivo, Morto).
-    val species: String, // Espécie do personagem (ex.: Humano, Alien).
-    val imageUrl: String // URL da imagem do personagem.
-)
